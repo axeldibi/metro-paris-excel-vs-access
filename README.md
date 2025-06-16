@@ -9,9 +9,20 @@ In Excel, Power Query carries out these joins and builds the final Trajets table
 
 ## Quick Start  
  
-1. Open the `.xlsm` (Excel) or `.accdb` (Access) file.
-2. Enable macros/content when prompted.
-3. Start selecting your departure (Départ) and arrival stations (Arrivée).
+> ⚠️ **Macro Security**  
+> Office blocks macros by default—always review the code or use an isolated sandbox/VM before enabling.
 
+1. **Download**  
+   - `Demo.xlsm` (Excel) or `Demo.accdb` (Access)
+
+2. **Open**  
+   - In Excel/Access, go to **File → Open** (macros stay disabled)
+
+3. **Enable**  
+   - Click **Enable Content** **only** after you’ve reviewed the code or are running in an offline sandbox/VM
+
+4. **Use**  
+   - **Excel**: Select your **Departure** and **Arrival**, then click the button   
+   - **Access**: Select **Departure** and **Arrival**—the results update automatically
 ## Contributing  
 Feel free to submit issues or pull requests for enhancements or bug fixes.
