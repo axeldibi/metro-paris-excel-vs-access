@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mon Portfolio</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- ======================
+         EN-TÊTE DU SITE
+         ====================== -->
+    <header class="site-header">
+      <h1 class="site-title">Planificateur interactif d’itinéraires de métro</h1>
+    </header>
+
+    <!-- ======================
+         SECTION “À PROPOS”
+         ====================== -->
+    <section id="apropos" class="section">
+      <h2 class="section-title"> </h2>
+      <hr class="section-line">
+      <p class="text-normal">
+        Un simple planificateur interactif d’itinéraires de métro, conçu entièrement dans Excel puis dans Access, sans utiliser l’algorithme de Dijkstra.
+      </p>
+    </section>
+
+    <!-- ======================
+         SECTION “TRAVAUX”
+         ====================== -->
+    <section id="travaux" class="section">
+      <h2 class="section-title">Travaux</h2>
+      <hr class="section-line">
+
+
+        <!-- Projet Sandbox -->
+      <div class="project-entry">
+        <div class="project-header">
+          <a href="sandbox.html" class="project-title">Exécution sécurisée avec Windows Sandbox</a>
+          <span class="project-tech"><em>Windows Sandbox</em></span>
+        </div>
+          Tester vos macros sans danger avec Windows Sandbox 
+        <p class="text-normal">
+          <a href="sandbox.html" class="learn-more">En savoir plus →</a>
+        </p>
+      </div>
+
+
+      <!-- Projet 1 -->
+      <div class="project-entry">
+        <div class="project-header">
+          <a href="projet1.html" class="project-title">Planificateur d’itinéraires Métro (version Excel)</a>
+          <span class="project-tech"><em>Excel avancé, Power Query, VBA</em></span>
+        </div>
+        <ul class="project-bullets">
+          <li>Développement d’un outil de recherche d’itinéraires métro avec <strong>importation et transformation</strong> des données via Power Query et utilisation de <strong>fonctions avancées d’Excel</strong>.</li>
+          <li>Conception d’une interface ergonomique avec <strong>listes déroulantes dynamiques</strong> pour faciliter la sélection des gares.</li>
+          <li>Automatisation de la gestion des données et du calcul des trajets grâce à des <strong>macros</strong>.</li>
+        </ul>
+        <p class="text-normal">
+          <a href="projet1.html" class="learn-more">En savoir plus →</a>
+        </p>
+      </div>
+
+      <!-- Projet 2 (mis à jour) -->
+      <div class="project-entry">
+        <div class="project-header">
+          <a href="projet2.html" class="project-title">Planificateur d’itinéraires Métro (version Access)</a>
+          <span class="project-tech"><em>Access, requêtes SQL, macros</em></span>
+        </div>
+        <ul class="project-bullets">
+          <li><strong>Importation et structuration</strong> des données des lignes de métro via une table Access et des <strong>requêtes SQL paramétrées</strong> (jointures internes, requêtes de création de tables et d’insertion).</li>
+          <li>Conception d’un <strong>formulaire ergonomique</strong> avec listes déroulantes et <strong>sous-formulaire</strong> affichant <strong>dynamiquement</strong> les trajets possibles.</li>
+          <li><strong>Automatisation complète</strong> du traitement (vidage de la table, calcul des itinéraires directs et avec changements, mise à jour) grâce à des <strong>macros Access intégrées</strong>.</li>
+        </ul>
+        <p class="text-normal">
+          <a href="projet2.html" class="learn-more">En savoir plus →</a>
+        </p>
+      </div>
+
+
+
+    </section>
+
+
+
+  </div> <!-- /wrapper -->
+</body>
+</html>

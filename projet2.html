@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projet 2 : Planificateur d’itinéraires Métro (version Access)</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="wrapper">
+    <!-- SECTION UNIQUE POUR LE PROJET 2 -->
+    <section class="section">
+
+      <!-- TITRE PRINCIPAL DU PROJET (NIVEAU H2) -->
+      <h2 class="section-title">Planificateur d’itinéraires Métro (version Access)</h2>
+      <hr class="section-line">
+
+      <!-- DESCRIPTION GÉNÉRALE -->
+      <p class="text-normal">
+        Ce fichier propose essentiellement le même outil de recherche d’itinéraire que celui du classeur Excel, mais s’appuie cette fois sur un SGBD natif pour gérer les données. L’utilisateur sélectionne ses gares de départ et d’arrivée dans deux <strong>ComboBox</strong> (Liste déroulante avec saisie possible) liées à la table <strong>Choix</strong>, et, pour varier l’approche par rapport à la version Excel, on utilise l’événement « <strong>Après mise à jour</strong> » des <strong>ComboBox</strong> pour déclencher automatiquement une requête qui vide la table <strong>Trajets</strong> puis réinjecte tous les itinéraires (directs, avec un changement ou deux changements) via une succession de requêtes SQL, sans code VBA. Le sous-formulaire se rafraîchit immédiatement pour afficher les trajets triés par temps, sans que l’on ait à cliquer sur un bouton.
+      </p>
+      <p class="text-normal">
+        Rappel: le fichier source, <code>Lignes.txt</code>, contient trois colonnes (<em>ligne</em>, <em>temps</em>, <em>gare</em>). Pour chaque ligne de métro (dans un sens défini de façon arbitraire), on y trouve la liste des gares desservies et le temps d’accès, en secondes, depuis le terminus de départ. Le classeur s’appuie exclusivement sur ces données pour calculer les itinéraires. En conséquence, si le réseau a évolué (par exemple l’ajout récent d’une nouvelle ligne ou la modification de certains temps de parcours), le résultat peut légèrement différer de la situation réelle.
+      </p>
+
+      <!-- SOUS-BLOC 1 : STRUCTURE DE LA BASE ET IMPORT -->
+      <h3 class="subsection-title">Structure de base</h3>
+      <hr class="section-line">
+
+      <p class="text-normal">
+      Le fichier texte <code>Lignes.txt</code> est importé dans la table <strong>Lignes</strong> sans ajouter de clé primaire, et ses trois colonnes (<em>ligne</em>, <em>temps</em>, <em>gare</em>) sont respectivement typées en Texte, Double et Texte. Ensuite, on crée manuellement la table <strong>Choix</strong>, qui ne contient que deux champs : <code>GareDepart</code> et <code>GareArrivee</code>. Le formulaire principal, nommé <strong>Guide</strong>, s’appuie sur cette table <strong>Choix</strong> qui comporte deux <strong>ComboBox</strong> liées à une requête SQL récupérant toutes les gares distinctes de la table <strong>Lignes</strong>. Dès que l’utilisateur modifie l’une des ComboBox de Guide, la macro incorporée est déclenchée et met immédiatement à jour la table <strong>Trajets</strong>.
+      </p>
+
+      <!-- SOUS-BLOC 2 : REQUÊTES SQL INTERMÉDIAIRES -->
+      <h3 class="subsection-title">Requêtes SQL intermédiaires</h3>
+      <hr class="section-line">
+
+      <p class="text-normal">
+        Plusieurs requêtes SQL filtrent, associent et calculent le temps de parcours (passer en mode SQL dans l’éditeur de requêtes d’Access pour les visualiser) :
+      </p>
+      <ul class="project-bullets">
+        <li>
+          <strong>LignesDépart</strong> : retient, parmi <strong>Lignes</strong>, toutes les lignes desservant la gare de départ choisie, en renvoyant les colonnes <code>GareDépart</code>, <code>ligne</code> et <code>temps</code>.
+        </li>
+        <li>
+          <strong>LignesArrivée</strong> : même principe pour la gare d’arrivée, retournant <code>GareArrivée</code>, <code>ligne</code> et <code>temps</code>.
+        </li>
+        <li>
+          <strong>Corresp</strong> : associe deux copies de <strong>Lignes</strong> pour récupérer tous les couples de lignes partageant une station ; sa clause SQL exclut les correspondances sur la même ligne. Elle renvoie <code>LigneAvant</code>, <code>LigneAprès</code>, <code>gare</code>, <code>tempsAvant</code> et <code>tempsAprès</code>.
+        </li>
+        <li>
+          <strong>Avec0Chgt</strong> : joint les tables <code>LignesDépart</code> et <code>LignesArrivée</code> sur le même numéro de ligne, sélectionne pour chaque trajet la gare de départ, la gare d’arrivée, la ligne et la différence absolue de leurs temps, puis affiche le tout classé par ordre croissant de cette différence.
+        </li>
+        <li>
+          <strong>Avec1Chgt</strong> : Cette requête établit tous les trajets à une correspondance en joignant <code>LignesDépart</code> à Corresp puis à <code>LignesArrivée</code>, filtre pour éviter de repasser par la même gare, calcule le temps total comme la somme des écarts de temps avant et après la correspondance, et classe les résultats par ordre croissant de ce temps.
+        </li>
+        <li>
+          <strong>Avec2Chgt</strong> : Cette requête génère tous les itinéraires à deux correspondances en enchaînant les tables <code>LignesDépart</code>, <code>Corresp</code> (deux alias) et <code>LignesArrivée</code> pour obtenir la gare de départ, les deux gares de correspondance (avec leur ligne après) et la gare d’arrivée. Elle calcule le temps total du trajet comme la somme des écarts absolus entre les temps de départ et d’arrivée de chaque segment. Le filtre <code>WHERE</code> veille à ce que chacune des quatre gares soit distincte pour éviter tout retour en arrière. Enfin, elle classe les résultats par ordre croissant de ce temps total.
+        </li>
+        <li>
+          <strong>Requêtes d'ajout</strong> :
+        Ces trois dernières requêtes sont successivement envoyées dans la table Access <strong>Trajets</strong> via trois requêtes d’ajout (<strong>RequêtesAjout1Trajets</strong> pour “Avec0Chgt”, <strong>RequêtesAjout2Trajets</strong> pour “Avec1Chgt” et <strong>RequêtesAjout3Trajets</strong> pour “Avec2Chgt”), puis l’ensemble des enregistrements de </strong>Trajets</strong> est trié par le champ <code>Temps</code>.
+        </li>
+        <li>
+          <strong>RequêteSuppressionTrajet</strong> : Cette requête permet de vider la table <strong>Trajets</strong> avant chaque nouvelle exécution de la macro. Elle est essentielle pour éviter l’accumulation des anciens trajets et garantir que seuls les trajets correspondant aux gares sélectionnées sont affichés.
+        </li>
+      </ul>
+      <!-- SOUS-BLOC 3 : MACROS D’INSERTION ET SOUS-FORMULAIRE -->
+      <h3 class="subsection-title">Macros d’insertion et sous-formulaire</h3>
+      <hr class="section-line">
+
+      <p class="text-normal">
+        La macro efface d’abord tous les enregistrements de la table Trajets via la requête de suppression, exécute ensuite successivement les trois requêtes d'ajout, puis rafraîchit le sous-formulaire pour afficher la table Trajets.
+      </p>
+
+      <p class="text-normal">
+        Le formulaire <strong>Guide</strong> (créé en mode Création Access) regroupe :
+      </p>
+      <ul class="project-bullets">
+        <li>Deux <strong>ComboBox</strong> représentant le départ et l'arrivée qui déclenchent la macro dès changement de la gare</li>
+        <li>Un <strong>sous-formulaire</strong>, nommé <code>ListeTrajets</code>, qui utilise la table <strong>Trajets</strong> comme source de données. Il se rafraîchit dès la fin de l’exécution de la macro et présente la liste des trajets possibles. Ce même sous-formulaire est présenté plus lisiblement dans un état Access éponyme</li>
+        <li>Un <strong>bouton de commande</strong> lié à une macro incorporée permettant d'exporter le contenu de <code>ListeTrajets</code> au format pdf</li>  
+        <li>Un contôle <strong>Image</strong> pour afficher une image de fond derrière les autres contrôles. </li>
+        
+      <p class="text-normal"> 
+        Aucun autre code VBA n’est nécessaire : toute la logique se gère via l’éditeur de macros d’Access et ses actions.
+      </p>
+
+      <p class="text-normal">
+        Le formulaire s'ouvre automatiquement au démarrage, grâce à une macro nommée <strong>AutoExec</strong> contenant simplement l’action <strong>OuvrirFormulaire</strong>. À chaque lancement de la base, Access exécutera <em>AutoExec</em> puis ouvrira <em>Guide</em>, prêt à l’emploi.
+      </p>
+
+      <!-- APERÇU DE L’INTERFACE -->
+      <h3 class="subsection-title">Interface</h3>
+      <hr class="section-line">
+
+      <p class="text-normal">
+        Voici un aperçu du formulaire Access <code>Guide</code> affichant les ComboBox pour le choix de gare et le sous-formulaire <code>ListeTrajets</code> :
+      </p>
+      <div style="text-align: center; margin-top: 15px;">
+        <img
+          src="images/faceAccess.png"
+          alt="Capture d’écran du formulaire Guide dans Access"
+          style="max-width: 100%; border: 1px solid #ccc;"
+        />
+      </div>
+
+      <!-- TÉLÉCHARGEMENTS -->
+      <p class="text-normal">
+        • <a href="https://raw.githubusercontent.com/axeldibi/metro-paris-excel-vs-access/main/Lignes.txt" download>Fichier source “Lignes.txt”</a><br>
+        • <a href="https://raw.githubusercontent.com/axeldibi/metro-paris-excel-vs-access/main/MetroParis_vAccess.accdb" download>Télécharger le fichier Access</a>
+      </p>
+
+      <div class="alert alert-warning">
+        <h3>Sécurité des macros</h3>
+        <p>
+          Par défaut, Microsoft Office bloque l’exécution des macros pour vous protéger
+          contre les codes malveillants susceptibles d’endommager votre système ou de dérober vos données.
+        </p>
+        <p>
+          Ce fichier Access contient des fonctionnalités avancées 
+          basées sur des macros : pour les activer, vous devrez autoriser les macros.
+        </p>
+        <p>
+          <strong>Important :</strong> n’exécutez jamais une macro sans en avoir vérifié le code.  
+          Pour plus de sécurité, exécutez-les dans une sandbox ou une machine virtuelle isolée — 
+          <a href="sandbox.html">voir le tutoriel Windows Sandbox</a>.
+        </p>
+      </div>
+
+      <!-- LIEN DE RETOUR -->
+      <p style="margin-top:20px;">
+        <a href="index.html#travaux">&larr; Retour aux travaux</a>
+      </p>
+    </section>
+
+
+
+  </div> <!-- /wrapper -->
+</body>
+</html>

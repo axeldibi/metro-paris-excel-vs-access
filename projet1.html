@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projet 1 : Planificateur d’itinéraires Métro (version Excel)</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- SECTION UNIQUE POUR LE PROJET 1 -->
+    <section class="section">
+
+      <!-- TITRE PRINCIPAL DU PROJET (NIVEAU H2) -->
+      <h2 class="section-title">Planificateur d’itinéraires Métro (version Excel)</h2>
+      <hr class="section-line">
+
+      <!-- DESCRIPTION GÉNÉRALE / SOMMAIRE -->
+      <p class="text-normal">
+        Ce classeur propose un outil de recherche d’itinéraires pour le métro de Paris en utilisant exclusivement Excel, Power Query et du code VBA.  
+        L’utilisateur sélectionne deux gares (départ et arrivée) dans des listes déroulantes, puis clique sur un bouton pour afficher instantanément tous les trajets possibles (directs, avec un changement ou deux changements) triés par temps de parcours.
+      </p>
+      <p class="text-normal">
+        Le fichier source, <code>Lignes.txt</code>, contient trois colonnes (<em>ligne</em>, <em>temps</em>, <em>gare</em>). Pour chaque ligne de métro (dans un sens défini de façon arbitraire), on y trouve la liste des gares desservies et le temps d’accès, en secondes, depuis le terminus de départ. Le classeur s’appuie exclusivement sur ces données pour calculer les itinéraires. En conséquence, si le réseau a évolué (par exemple l’ajout récent d’une nouvelle ligne ou la modification de certains temps de parcours), le résultat peut légèrement différer de la situation réelle.
+      </p>
+
+      <!-- ============================================== -->
+      <!-- SOUS-BLOC 1 : DESCRIPTION TECHNIQUE DÉTAILLÉE -->
+      <!-- ============================================== -->
+      <h3 class="subsection-title">Description technique </h3>
+      <hr class="section-line">
+
+      <p class="text-normal">
+        <strong>Dès l’ouverture</strong>, Power Query importe la source <code>Lignes.txt</code> en veillant à bien paramétrer l’encodage UTF-8 et les types de données (texte pour “ligne” et “gare”, nombre décimal pour “temps”).  
+        Une requête <code>ListeGares</code> déduplique la liste des gares pour générer la plage nommée <strong>Gares</strong>, utilisée ensuite pour alimenter dynamiquement les listes déroulantes.  
+        À chaque sélection, la table <strong>Choix</strong> (connexion unique, deux colonnes « GareDepart » et « GareArrivee ») est mise à jour par le formulaire, puis sert à filtrer les sous-ensembles : <code>LignesDepart</code> (toutes les lignes desservant la gare de départ) et <code>LignesArrivee</code> (toutes les lignes desservant la gare d’arrivée).
+      </p>
+
+      <p class="text-normal">
+        Pour construire les correspondances, une requête <code>Corresp</code> met en regard chaque ligne avec toutes les autres qui passent par la même station (excluant les lignes identiques), en conservant aussi les temps d’accès respectifs.  
+        Les requêtes <code>Avec0Chgt</code>, <code>Avec1Chgt</code> et <code>Avec2Chgt</code> réalisent successivement les jointures internes nécessaires :
+      </p>
+      <ul class="project-bullets">
+        <li>
+          <strong>Avec0Chgt</strong> : associe directement <code>LignesDepart</code> et <code>LignesArrivee</code> sur le même numéro de ligne pour lister les trajets sans changement.  
+          Une colonne calculée <code>Temps</code> = |tempsDépart − tempsArrivée| donne la durée du parcours.
+        </li>
+        <li>
+          <strong>Avec1Chgt</strong> : fusionne d’abord <code>LignesDepart</code> avec <code>Corresp</code> (pour identifier le premier point de correspondance), filtre les cas où la correspondance est valide (ni retour sur la gare de départ, ni passage par la gare d’arrivée), puis fusionne le résultat avec <code>LignesArrivee</code> pour récupérer le temps d’arrivée.  
+          La colonne <code>Temps</code> est calculée en sommant la différence absolue entre temps de départ et d’arrivée au niveau de la correspondance.
+        </li>
+        <li>
+          <strong>Avec2Chgt</strong> : même logique que “Avec1Chgt” en deux étapes.  
+          On duplique <code>Corresp</code> (alias <code>Corresp2</code>) pour trouver un deuxième changement, on filtre chaque étape afin d’éviter retours en arrière ou boucles (les gares et lignes consécutives doivent être distinctes), puis on associe enfin <code>LignesArrivee</code>.  
+          Le calcul du <code>Temps</code> cumule les trois segments successifs.
+        </li>
+      </ul>
+
+      <p class="text-normal">
+        Ces trois requêtes sont alors « empilées » dans la requête finale <strong>Trajets</strong>, qui regroupe tous les itinéraires (direct, un changement, deux changements) et trie l’ensemble par temps croissant. La colonne <code>Temps</code> est remplacée par une colonne <code>Durée</code>, convertissant les secondes en format plus lisible (h:mm:ss).  
+        La table <code>Trajets</code> est chargée dans une feuille dédiée, au format ListObject, avec huit colonnes :  
+        <code>GareDepart</code>, <code>L0</code> (ligne initiale), <code>Chgt1</code>, <code>L1</code>, <code>Chgt2</code>, <code>L2</code>, <code>GareArrivee</code> et <code>Durée</code>.
+      </p>
+
+      <!-- ============================================== -->
+      <!-- SOUS-BLOC 2 : FORMULAIRE VBA & INTERFACE       -->
+      <!-- ============================================== -->
+      <h3 class="subsection-title">Interface</h3>
+      <hr class="section-line">
+
+      <p class="text-normal">
+        Le formulaire VBA, nommé <strong>Guide</strong>, rassemble essentiellement une image de fond sur laquelle sont superposés deux <strong>ComboBox</strong> (Liste déroulantes avec saisie possible) liées à la plage <strong>Gares</strong>, un <strong>CommandButton</strong> (Bouton cliquable) pour déclencher le calcul et une <strong>ListBox</strong> (liste simple) affichant les résultats.  
+      </p>
+      <p class="text-normal">
+        Au clic sur « Afficher les trajets » (procédure <code>CmdGo_Click</code>), le code VBA vérifie d’abord que les deux ComboBox sont non vides et distinctes.  
+        La table <strong>Choix</strong> est alors mise à jour en plaçant les valeurs retenues dans la première ligne du ListObject (<strong>Tableau3</strong>).  
+        Ensuite, le code met à jour la requête Power Query “Trajets” (ListObject “Trajets”), désactive le <code>BackgroundQuery</code> pour forcer un rafraîchissement synchrone, puis exécute <code>.Refresh</code> pour que la requête M se réévalue immédiatement.  
+        Dès que la requête a terminé, le contenu du ListObject “Trajets” est chargé dans un tableau VBA (<code>arr = lo.DataBodyRange.Value</code>), puis assigné directement à la ListBox (<code>.RowSource = ""</code> pour rompre l’ancienne liaison, suivi de <code>.List = arr</code>).  
+        Les optimisations de performances sont assurées par la désactivation temporaire de <code>ScreenUpdating</code>, <code>EnableEvents</code> et <code>Calculation</code>, rétablie en fin de procédure.
+      </p>
+      <p class="text-normal">
+        Le bouton "Cliquer ici pour lancer le guide" dans la feuille Excel "Formulaire" est lié à une macro standard, <code>AfficherGuide()</code>. Ce bouton se contente de lancer le formulaire au clic (<code>Guide.Show</code>).  
+      </p>
+      <p class="text-normal">
+        Ainsi, en quelques clics, l’utilisateur accède à l’ensemble des itinéraires disponibles pour aller d’une gare à une autre, avec tous les changements éventuels.  
+        Les données se rafraîchissent en temps réel, la recherche est quasi instantanée grâce aux optimisations VBA, et l’interface assure une présentation claire et agréable.
+      </p>
+
+      <!-- Indication et aperçu de l’interface VBA -->
+      <p class="text-normal">
+        Ci-dessous, un aperçu de l’interface :
+      </p>
+      <div style="text-align: center; margin-top: 15px;">
+        <img
+          src="images/faceExcel.png"
+          alt="Capture d’écran de l’interface VBA du formulaire Guide"
+          style="max-width: 100%; border: 1px solid #ccc;"
+        />
+      </div>
+
+      <!-- ============================================== -->
+      <!-- SOUS-BLOC 3 : DONNÉES SOURCES & TÉLÉCHARGEMENT -->
+      <!-- ============================================== -->
+      <h3 class="subsection-title">Téléchargements</h3>
+      <hr class="section-line">
+
+      <p class="text-normal">
+        • <a href="https://raw.githubusercontent.com/axeldibi/metro-paris-excel-vs-access/main/Lignes.txt" download>Fichier source “Lignes.txt”</a><br>
+        • <a href="https://raw.githubusercontent.com/axeldibi/metro-paris-excel-vs-access/main/MetroParis_vExcel.xlsm" download>Télécharger le classeur Excel </a>
+      </p>
+
+        <div class="alert alert-warning">
+  <h3>Sécurité des macros</h3>
+  <p>
+    Par défaut, Microsoft Office bloque l’exécution des macros pour vous protéger
+    contre les codes malveillants susceptibles d’endommager votre système ou de dérober vos données.
+  </p>
+  <p>
+    Ce classeur contient des fonctionnalités avancées 
+    basées sur des macros : pour les activer, vous devrez autoriser les macros.
+  </p>
+  <p>
+    <strong>Important :</strong> n’exécutez jamais une macro sans en avoir vérifié le code.  
+    Pour plus de sécurité, exécutez-les dans une sandbox ou une machine virtuelle isolée — 
+    <a href="sandbox.html">voir le tutoriel Windows Sandbox</a>.
+  </p>
+</div>
+
+
+
+
+      <!-- LIEN DE RETOUR -->
+      <p style="margin-top:20px;">
+        <a href="index.html#projets">&larr; Retour aux travaux</a>
+      </p>
+    </section>
+
+
+
+  </div> <!-- /wrapper -->
+</body>
+</html>

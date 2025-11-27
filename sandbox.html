@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projet – Windows Sandbox</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- EN-TÊTE -->
+    <section id="sandbox" class="section">
+      <h2 class="section-title">Exécution sécurisée avec Windows Sandbox</h2>
+      <hr class="section-line">
+
+      <p class="text-normal">
+        Pour ouvrir en toute sécurité un fichier contenant des macros potentiellement malveillantes, l’idée est de l’isoler du système hôte afin que, même si la macro exécute du code dangereux, elle ne puisse pas toucher vos données ni votre réseau.
+      </p>
+
+      <p class="text-normal">
+        <strong>Utiliser Windows Sandbox </strong><br>
+        Windows Sandbox est un mini-Windows jetable qui se détruit à la fermeture.
+        Si vous n’avez pas Windows Sandbox, vous pouvez utiliser une machine virtuelle avec un système d’exploitation isolé, comme VirtualBox ou VMware. Cependant, Windows Sandbox est plus simple à configurer et à utiliser pour ce type de tâche.</p>
+
+      <p class="text-normal">
+        <strong>Activer la fonctionnalité :</strong>
+      </p>
+      <ul class="project-bullets">
+        <li>Ouvrez <em>Panneau de configuration → Programmes → Activer ou désactiver des fonctionnalités Windows</em>.</li>
+        <li>Cochez <em>Windows Sandbox (ou bac à sable Windows)</em>, cliquez sur <strong>OK</strong> et redémarrez.</li>
+      </ul>
+
+      <p class="text-normal">
+        <strong>Lancer Windows Sandbox :</strong><br>
+        Tapez « Sandbox » dans le menu Démarrer et ouvrez l’application.
+      </p>
+
+      <p class="text-normal">
+        <strong>Importer et ouvrir votre fichier :</strong>
+      </p>
+      <ul class="project-bullets">
+        <li>Dans la fenêtre Sandbox, faites glisser (ou copier/couper coller) votre fichier contenant les macros depuis l’explorateur de l’hôte vers celui de la Sandbox.</li>
+        <li>Coupez l’accès réseau de la Sandbox. Pour cela, vous pouvez exécuter dans le PowerShell de la Sandbox: <pre> <code>Disable-NetAdapter -Name "Ethernet" -Confirm:$false</code></pre>
+          <li>Ouvrez le fichier avec l'application dédiée (par exemple Excel pour les <code>.xlsm</code>), <strong>Installée dans la Sandbox</strong> .</li>
+      </ul>
+
+      <p class="text-normal">
+        <strong>Travailler en toute tranquillité :</strong><br>
+        À la fermeture de la Sandbox, tout le contenu (y compris le fichier et les éventuelles infections) est définitivement supprimé.
+      </p>
+
+      <!-- Lien vers une page externe -->
+      <p class="text-normal">
+        Pour en savoir plus, visiter  
+        <a href="https://learn.microsoft.com/fr-fr/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file" target="_blank" rel="noopener noreferrer">
+          le site de la documentation de Windows Sandbox publié par Microsoft
+        </a>.
+      </p>
+
+      <p class="text-normal">
+        <em>Mettre en application ces principes de sécurité :</em>
+      </p>
+      <ul class="project-bullets">
+        <li><a href="projet1.html" class="learn-more">Projet Excel (version Excel avec macros)</a></li>
+        <li><a href="projet2.html" class="learn-more">Projet Access (version Access avec macros)</a></li>
+      </ul>
+
+
+      <p style="margin-top:20px;">
+        <a href="index.html#travaux" class="learn-more">&larr; Retour aux travaux</a>
+      </p>
+    </section>
+
+
+
+  </div> <!-- /wrapper -->
+</body>
+</html>
+
