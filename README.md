@@ -13,7 +13,7 @@ In Excel, Power Query carries out these joins and builds the final Trajets table
 > Office blocks macros by default—always review the code or use an isolated sandbox/VM before enabling.
 
 1. **Download**  
-   - `Demo.xlsm` (Excel) or `Demo.accdb` (Access)
+   - `MetroParis_vExcel.xlsm` (Excel) or `MetroParis_vAccess.accdb` (Access)
 
 2. **Open**  
    - In Excel/Access, go to **File → Open** (macros stay disabled)
