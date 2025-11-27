@@ -1,0 +1,177 @@
+/* ===========================
+   RESET / BASE
+   =========================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Police de base (Arial pour ressembler à un style type CV) */
+body {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #222222;
+  background-color: #ffffff;
+  padding: 20px;
+}
+
+/* Wrapper pour centrer le contenu et limiter la largeur */
+.wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ===========================
+   TITRES (H1, H2)
+   =========================== */
+.site-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.site-subtitle {
+  font-size: 1rem;
+  text-align: center;
+  color: #555555;
+  margin-bottom: 20px;
+}
+
+/* Menu de navigation (situer en haut du CV, mais discret) */
+.main-nav {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.nav-list {
+  list-style: none;
+  display: inline-flex;
+  gap: 20px;
+}
+.nav-list a {
+  text-decoration: none;
+  color: #333333;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+.nav-list a:hover {
+  text-decoration: underline;
+}
+
+/* Styles pour les sections */
+.section {
+  margin-bottom: 30px;
+}
+
+/* Titre de section (“À propos”, “Projets”, etc.) */
+.section-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #1a73e8; /* bleu type CV */
+  margin-bottom: 5px;
+}
+
+/* Ligne horizontale sous les titres de section */
+.section-line {
+  border: none;
+  border-top: 2px solid #cccccc;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+/* Texte courant */
+.text-normal {
+  font-size: 14px;
+  color: #222222;
+  margin-bottom: 10px;
+}
+
+/* ===========================
+   SECTION “PROJETS”
+   =========================== */
+.project-entry {
+  margin-bottom: 20px;
+}
+
+/* En-tête de chaque projet : titre à gauche + techno à droite */
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+/* Titre du projet (gras + souligné) */
+.project-title {
+  font-weight: bold;
+  text-decoration: underline;
+  font-size: 1rem;
+  color: #000000;
+}
+
+/* Technologies du projet (italique, taille un peu plus petite) */
+.project-tech {
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #333333;
+}
+
+/* Liste des puces de chaque projet */
+.project-bullets {
+  list-style: disc inside;
+  margin-left: 10px;
+}
+.project-bullets li {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #222222;
+}
+
+/* ===========================
+   SECTION “COMPÉTENCES”
+   =========================== */
+.skills-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 5px;
+}
+.skills-list li {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #222222;
+  position: relative;
+  padding-left: 15px;
+}
+/* Pour simuler un petit tiret comme puce “style CV” */
+.skills-list li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: #222222;
+}
+
+/* ===========================
+   SECTION “CONTACT”
+   =========================== */
+.site-footer a {
+  color: #1a73e8;
+  text-decoration: none;
+}
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ===========================
+   PIED DE PAGE
+   =========================== */
+.site-footer {
+  border-top: 1px solid #dddddd;
+  padding-top: 15px;
+  text-align: center;
+  font-size: 13px;
+  color: #555555;
+  margin-top: 40px;
+}
