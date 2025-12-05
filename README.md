@@ -13,8 +13,9 @@ In Excel, Power Query carries out these joins and builds the final Trajets table
 > Office blocks macros by default—always review the code or use an isolated sandbox/VM before enabling.
 
 1. **Download**  
-   - `MetroParis_vExcel.xlsm` (Excel) or `MetroParis_vAccess.accdb` (Access)
-
+   - `vExcel.xlsm` (Excel) or `MetroParis_vAccess.accdb` (Access)  
+     The file `MetroParis_vExcel.xlsm` depends on the absolute path `C:\Users\Utilisateur\Documents\Projet_Excel\Lignes.txt`, which limits its portability.
+     
 2. **Open**  
    - In Excel/Access, go to **File → Open** (macros stay disabled)
 
@@ -22,7 +23,5 @@ In Excel, Power Query carries out these joins and builds the final Trajets table
    - Click **Enable Content** **only** after you’ve reviewed the code or are running in an offline sandbox/VM
 
 4. **Use**  
-   - **Excel**: Select your **Departure** and **Arrival**, then click the button   
+   - **Excel**: Select your **Departure** and **Arrival**, then click the main button (Click ¤ to initialize the engine for smoother first-run performance.)   
    - **Access**: Select **Departure** and **Arrival**—the results update automatically
-## Contributing  
-Feel free to submit issues or pull requests for enhancements or bug fixes.
